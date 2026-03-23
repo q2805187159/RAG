@@ -1,37 +1,37 @@
 # RAG
 
-Structured document retrieval toolkit for turning long PDFs or Markdown files into hierarchical trees and queryable hybrid indexes.
+一个结构化文档检索工具包，用于把长 PDF 或 Markdown 文档转换为层级树，并构建可查询的混合索引。
 
-> This repository is a downstream refactor based on the open-source [PageIndex](https://github.com/VectifyAI/PageIndex) project.  
-> The original branding, package layout, CLI entrypoints, and product-facing docs were replaced so this repo can stand on its own as a new project while keeping clear attribution to its upstream foundation.
+> 本仓库是基于开源项目 [PageIndex](https://github.com/VectifyAI/PageIndex) 进行的下游重构。  
+> 我们替换了原有的品牌命名、包结构、CLI 入口和面向产品的说明文档，使这个仓库能够以一个独立项目的形式运行，同时明确保留对上游项目的来源说明。
 
-## What This Project Does
+## 这个项目能做什么
 
-RAG focuses on two practical workflows:
+RAG 目前聚焦两个核心工作流：
 
-1. Build a structured tree from a long PDF or Markdown document.
-2. Build a local query index on top of that tree for deterministic retrieval and optional LLM reranking.
+1. 从长 PDF 或 Markdown 文档中构建结构化树。
+2. 在这棵树之上构建本地查询索引，用于确定性检索和可选的 LLM 重排序。
 
-The current implementation combines:
+当前实现组合了以下能力：
 
-- Hierarchical document parsing
-- Inverted index retrieval
-- Roaring Bitmap postings when available
-- Hash-based direct lookup
-- Page-range filtering
-- Optional LLM reranking over a reduced candidate set
+- 层级化文档解析
+- 倒排索引检索
+- 可用时使用 Roaring Bitmap postings
+- 基于哈希的快速直达查找
+- 页码范围过滤
+- 对候选结果进行可选的 LLM 重排序
 
-## Key Capabilities
+## 关键能力
 
-- Parse PDFs into section trees with page spans and optional summaries
-- Parse Markdown into section trees based on heading levels
-- Build a compressed query index artifact for local search
-- Search by title, summary, path, or leaf text
-- Filter by leaf nodes and page ranges
-- Rerank deterministic search results with an LLM
-- Benchmark build, load, and query latency locally
+- 将 PDF 解析为带页码区间和可选摘要的章节树
+- 按 Markdown 标题层级构建章节树
+- 为本地搜索构建压缩的查询索引工件
+- 支持按标题、摘要、路径或叶子节点文本检索
+- 支持按叶子节点和页码范围过滤
+- 支持用 LLM 对确定性检索结果进行重排序
+- 支持本地 benchmark，评估构建、加载和查询延迟
 
-## Project Layout
+## 项目结构
 
 ```text
 rag/
@@ -56,17 +56,17 @@ scripts/
 docs/
 ```
 
-## Installation
+## 安装
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-The bitmap backend uses `pyroaring`. It is already listed in `requirements.txt`.
+位图后端依赖 `pyroaring`，该依赖已经包含在 `requirements.txt` 中。
 
-## Environment Variables
+## 环境变量
 
-Create a local `.env` file if you want to use live LLM reranking:
+如果你要使用在线 LLM 重排序，请在本地创建 `.env` 文件：
 
 ```bash
 MODEL=your_provider_model
@@ -74,23 +74,23 @@ API_KEY=your_api_key
 API_URL=your_base_url
 ```
 
-The runtime also supports OpenAI-compatible names such as `OPENAI_API_KEY`, `OPENAI_API_BASE`, and `OPENAI_BASE_URL`.
+运行时也兼容 OpenAI 风格的环境变量命名，例如 `OPENAI_API_KEY`、`OPENAI_API_BASE` 和 `OPENAI_BASE_URL`。
 
-## Quick Start
+## 快速开始
 
-### Build a PDF tree
+### 构建 PDF 树
 
 ```bash
 python run_rag.py --pdf_path /path/to/document.pdf
 ```
 
-### Build a Markdown tree
+### 构建 Markdown 树
 
 ```bash
 python run_rag.py --md_path /path/to/document.md --if-add-node-summary no
 ```
 
-### Build a query index and run a query
+### 构建查询索引并执行查询
 
 ```bash
 python run_rag.py \
@@ -101,7 +101,7 @@ python run_rag.py \
   --top-k 5
 ```
 
-### Run deterministic search with LLM rerank
+### 执行确定性检索并使用 LLM 重排序
 
 ```bash
 python run_rag.py \
@@ -113,7 +113,7 @@ python run_rag.py \
   --rerank-top-k 3
 ```
 
-### Benchmark the local index
+### 运行本地索引 benchmark
 
 ```bash
 python scripts/benchmark_query_index.py \
@@ -122,7 +122,7 @@ python scripts/benchmark_query_index.py \
   --query "supervisory developments"
 ```
 
-## Public Python API
+## 对外 Python API
 
 ```python
 from rag import (
@@ -134,7 +134,7 @@ from rag import (
 )
 ```
 
-Main entrypoints:
+主要入口函数：
 
 - `build_pdf_tree(...)`
 - `build_markdown_tree(...)`
@@ -142,14 +142,14 @@ Main entrypoints:
 - `search_index(...)`
 - `rerank_query_results(...)`
 
-## Outputs
+## 输出内容
 
-By default, the CLI writes:
+默认情况下，CLI 会写出：
 
-- Tree JSON: `results/<name>_structure.json`
-- Query index: `results/<name>_query_index.pkl.gz`
+- 树结构 JSON：`results/<name>_structure.json`
+- 查询索引：`results/<name>_query_index.pkl.gz`
 
-The query response is printed as JSON and includes:
+查询结果会以 JSON 格式输出，并包含：
 
 - `node_id`
 - `title`
@@ -160,9 +160,9 @@ The query response is printed as JSON and includes:
 - `matched_fields`
 - `ancestor_ids`
 
-## Testing
+## 测试
 
-Offline test suite:
+离线测试套件：
 
 ```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest \
@@ -175,7 +175,7 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest \
   -q -p no:cacheprovider
 ```
 
-Live LLM smoke test:
+在线 LLM 冒烟测试：
 
 ```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest \
@@ -183,11 +183,11 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest \
   -q -p no:cacheprovider -m live_llm
 ```
 
-## Attribution
+## 来源说明
 
-This project is based on the open-source PageIndex codebase and keeps that upstream relationship explicit.
+本项目基于开源的 PageIndex 代码库重构而来，并明确保留与上游项目的关系说明。
 
-- Upstream project: `VectifyAI/PageIndex`
-- Current repository goal: reshape that foundation into a standalone structured RAG toolkit with a different public identity and a refactored local retrieval layer
+- 上游项目：`VectifyAI/PageIndex`
+- 当前仓库目标：在保留上游基础能力的前提下，将其重塑为一个拥有独立公共标识、并具备本地混合检索层的结构化 RAG 工具包
 
-The upstream license should continue to be respected. See `LICENSE` and `NOTICE.md`.
+请继续遵守上游项目的许可证要求。详见 `LICENSE` 和 `NOTICE.md`。
